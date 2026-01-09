@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-"github.com/cloudlein/go-rest-service/internal/app/rest-api/constant"
+    constants "github.com/cloudlein/go-rest-service/internal/app/rest-api/constant"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
