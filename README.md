@@ -15,7 +15,3 @@ The primary objective of this codebase is educational. It is designed to documen
 ## Disclaimer
 
 Please note that this project is a work in progress and intended for study and experimentation. While it aims to follow professional standards, certain implementations may be simplified for learning purposes.
-
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
