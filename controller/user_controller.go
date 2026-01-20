@@ -5,20 +5,46 @@ import (
 
 	"github.com/cloudlein/go-rest-service/database"
 	"github.com/cloudlein/go-rest-service/models"
+	"github.com/cloudlein/go-rest-service/service"
 	"github.com/cloudlein/go-rest-service/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
-func GetAllUsers(c *fiber.Ctx) error {
-	var users []*models.User
+type UserController struct {
+	service service.UserService
+}
 
-	database.DB.Debug().Find(&users)
+func NewUserController(service service.UserService) *UserController {
+	return &UserController{
+		service: service,
+	}
+}
 
-	return c.Status(200).JSON(fiber.Map{
-		"message": "Success get all users",
-		"data":    users,
-	})
+func (c *UserController) GetAllUsers(ctx *fiber.Ctx) error {
+	page, _ := strconv.Atoi(ctx.Query("page", "1"))
+	limit, _ := strconv.Atoi(ctx.Query("limit", "10"))
+
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+	if limit > 100 {
+		limit = 100
+	}
+
+	users, total, err := c.service.GetAllUsers(page, limit)
+	if err != nil {
+		return ctx.Status(500).JSON(
+			utils.ErrorResponse("failed to get all users", err),
+		)
+	}
+
+	return ctx.JSON(
+		utils.SuccessWithPagination(users, page, limit, total, "Successfully to get all users"),
+	)
 }
 
 func CreateUsers(c *fiber.Ctx) error {
