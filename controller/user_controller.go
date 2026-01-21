@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/cloudlein/go-rest-service/database"
@@ -9,6 +10,7 @@ import (
 	"github.com/cloudlein/go-rest-service/utils"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type UserController struct {
@@ -86,20 +88,25 @@ func CreateUsers(c *fiber.Ctx) error {
 	})
 }
 
-func GetUserById(c *fiber.Ctx) error {
-	var user models.User
+func (c *UserController) GetUserById(ctx *fiber.Ctx) error {
 
-	result := database.DB.Debug().First(&user, c.Params("id"))
+	id, _ := strconv.ParseInt(ctx.Params("id"), 10, 64)
 
-	if result.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "user not found",
-		})
+	user, err := c.service.GetUserById(id)
+	if err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ctx.Status(404).JSON(
+				utils.ErrorResponse("user not found", err))
+		}
+
+		return ctx.Status(500).JSON(
+			utils.ErrorResponse("failed to get user", err))
 	}
 
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"data": user,
-	})
+	return ctx.JSON(
+		utils.SuccessResponse(user, "Successfully to get user"),
+	)
 }
 
 func UpdateUserById(c *fiber.Ctx) error {

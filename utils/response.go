@@ -17,9 +17,13 @@ type Pagination struct {
 	TotalPage int   `json:"total_page"`
 }
 
-func SuccessResponse(data interface{}) Response {
+func SuccessResponse(
+	data interface{},
+	message string,
+) Response {
 	return Response{
 		Success: true,
+		Message: message,
 		Data:    data,
 	}
 }
